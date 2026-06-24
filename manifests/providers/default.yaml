@@ -1,0 +1,307 @@
+version: 1
+name: stola-default-providers
+description: Default Stola provider catalog for Docker-only agent workspaces.
+default_provider: openrouter
+
+providers:
+  - id: openrouter
+    title: OpenRouter
+    kind: openai_compatible
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    extra_env:
+      - OR_SITE_URL
+      - OR_APP_NAME
+      - OPENROUTER_HTTP_REFERER
+      - OPENROUTER_APP_TITLE
+    litellm_model: openrouter/openai/gpt-5.5
+    model_examples:
+      - openai/gpt-5.5
+      - anthropic/claude-opus-4.8
+      - google/gemini-2.5-pro
+    enabled: true
+    notes: OpenAI-compatible router across many commercial and open models.
+
+  - id: openai
+    title: OpenAI
+    kind: openai_compatible
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+    litellm_model: openai/gpt-5.5
+    model_examples:
+      - gpt-5.5
+      - gpt-5.4-mini
+      - gpt-5.4-nano
+    enabled: true
+    notes: Direct OpenAI API.
+
+  - id: anthropic
+    title: Anthropic
+    kind: anthropic
+    base_url: https://api.anthropic.com
+    api_key_env: ANTHROPIC_API_KEY
+    litellm_model: anthropic/claude-fable-5
+    model_examples:
+      - claude-fable-5
+      - claude-opus-4-8
+      - claude-sonnet-4-6
+      - claude-haiku-4-5
+    enabled: true
+    notes: Direct Claude API.
+
+  - id: google_gemini
+    title: Google Gemini API
+    kind: google_gemini
+    api_key_env: GEMINI_API_KEY
+    litellm_model: gemini/gemini-2.5-pro
+    model_examples:
+      - gemini-2.5-pro
+      - gemini-2.5-flash
+    enabled: true
+    notes: Google AI Studio Gemini API.
+
+  - id: azure_openai
+    title: Azure OpenAI
+    kind: azure_openai
+    api_key_env: AZURE_OPENAI_API_KEY
+    extra_env:
+      - AZURE_OPENAI_ENDPOINT
+      - AZURE_OPENAI_API_VERSION
+      - AZURE_OPENAI_DEPLOYMENT
+    litellm_model: azure/$AZURE_OPENAI_DEPLOYMENT
+    model_examples:
+      - azure/<deployment-name>
+    enabled: true
+    notes: Azure deployment names are tenant-specific.
+
+  - id: aws_bedrock
+    title: AWS Bedrock
+    kind: aws_bedrock
+    extra_env:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_REGION
+      - AWS_PROFILE
+    litellm_model: bedrock/anthropic.claude-fable-5
+    model_examples:
+      - anthropic.claude-fable-5
+      - anthropic.claude-opus-4-8
+      - amazon.nova-pro-v1:0
+    enabled: true
+    notes: Uses AWS credentials instead of a single provider API key.
+
+  - id: groq
+    title: Groq
+    kind: openai_compatible
+    base_url: https://api.groq.com/openai/v1
+    api_key_env: GROQ_API_KEY
+    litellm_model: groq/llama-3.3-70b-versatile
+    model_examples:
+      - llama-3.3-70b-versatile
+      - openai/gpt-oss-120b
+    enabled: true
+
+  - id: mistral
+    title: Mistral AI
+    kind: openai_compatible
+    base_url: https://api.mistral.ai/v1
+    api_key_env: MISTRAL_API_KEY
+    litellm_model: mistral/mistral-large-latest
+    model_examples:
+      - mistral-large-latest
+      - codestral-latest
+    enabled: true
+
+  - id: cohere
+    title: Cohere
+    kind: custom
+    base_url: https://api.cohere.com
+    api_key_env: COHERE_API_KEY
+    litellm_model: command-r-plus
+    model_examples:
+      - command-r-plus
+      - command-r
+    enabled: true
+
+  - id: deepseek
+    title: DeepSeek
+    kind: openai_compatible
+    base_url: https://api.deepseek.com
+    api_key_env: DEEPSEEK_API_KEY
+    litellm_model: deepseek/deepseek-chat
+    model_examples:
+      - deepseek-chat
+      - deepseek-reasoner
+    enabled: true
+
+  - id: xai
+    title: xAI
+    kind: openai_compatible
+    base_url: https://api.x.ai/v1
+    api_key_env: XAI_API_KEY
+    litellm_model: xai/grok-4
+    model_examples:
+      - grok-4
+      - grok-3
+    enabled: true
+
+  - id: together
+    title: Together AI
+    kind: openai_compatible
+    base_url: https://api.together.xyz/v1
+    api_key_env: TOGETHER_API_KEY
+    litellm_model: together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo
+    model_examples:
+      - meta-llama/Llama-3.3-70B-Instruct-Turbo
+    enabled: true
+
+  - id: fireworks
+    title: Fireworks AI
+    kind: openai_compatible
+    base_url: https://api.fireworks.ai/inference/v1
+    api_key_env: FIREWORKS_API_KEY
+    litellm_model: fireworks_ai/accounts/fireworks/models/llama-v3p1-70b-instruct
+    model_examples:
+      - accounts/fireworks/models/llama-v3p1-70b-instruct
+    enabled: true
+
+  - id: perplexity
+    title: Perplexity
+    kind: openai_compatible
+    base_url: https://api.perplexity.ai
+    api_key_env: PERPLEXITY_API_KEY
+    litellm_model: perplexity/sonar-pro
+    model_examples:
+      - sonar-pro
+      - sonar
+    enabled: true
+
+  - id: cerebras
+    title: Cerebras
+    kind: openai_compatible
+    base_url: https://api.cerebras.ai/v1
+    api_key_env: CEREBRAS_API_KEY
+    litellm_model: cerebras/llama3.1-8b
+    model_examples:
+      - llama3.1-8b
+      - llama-4-scout-17b-16e-instruct
+    enabled: true
+
+  - id: sambanova
+    title: SambaNova Cloud
+    kind: openai_compatible
+    base_url: https://api.sambanova.ai/v1
+    api_key_env: SAMBANOVA_API_KEY
+    litellm_model: sambanova/Meta-Llama-3.1-405B-Instruct
+    model_examples:
+      - Meta-Llama-3.1-405B-Instruct
+    enabled: true
+
+  - id: replicate
+    title: Replicate
+    kind: custom
+    base_url: https://api.replicate.com/v1
+    api_key_env: REPLICATE_API_TOKEN
+    litellm_model: replicate/meta/meta-llama-3-70b-instruct
+    model_examples:
+      - meta/meta-llama-3-70b-instruct
+    enabled: true
+
+  - id: huggingface
+    title: Hugging Face
+    kind: custom
+    base_url: https://api-inference.huggingface.co
+    api_key_env: HUGGINGFACE_API_KEY
+    litellm_model: huggingface/meta-llama/Meta-Llama-3.1-8B-Instruct
+    model_examples:
+      - meta-llama/Meta-Llama-3.1-8B-Instruct
+    enabled: true
+
+  - id: cloudflare_workers_ai
+    title: Cloudflare Workers AI
+    kind: custom
+    api_key_env: CLOUDFLARE_API_TOKEN
+    extra_env:
+      - CLOUDFLARE_ACCOUNT_ID
+    litellm_model: cloudflare/@cf/meta/llama-3.1-8b-instruct
+    model_examples:
+      - '@cf/meta/llama-3.1-8b-instruct'
+    enabled: true
+
+  - id: nvidia_nim
+    title: NVIDIA NIM
+    kind: openai_compatible
+    base_url: https://integrate.api.nvidia.com/v1
+    api_key_env: NVIDIA_API_KEY
+    litellm_model: nvidia_nim/meta/llama-3.1-70b-instruct
+    model_examples:
+      - meta/llama-3.1-70b-instruct
+    enabled: true
+
+  - id: vercel_ai_gateway
+    title: Vercel AI Gateway
+    kind: openai_compatible
+    base_url: https://ai-gateway.vercel.sh/v1
+    api_key_env: VERCEL_AI_GATEWAY_API_KEY
+    litellm_model: openai/gpt-5.5
+    model_examples:
+      - openai/gpt-5.5
+      - anthropic/claude-opus-4-8
+    enabled: true
+
+  - id: litellm_proxy
+    title: LiteLLM Proxy
+    kind: litellm_proxy
+    base_url: http://127.0.0.1:4000/v1
+    api_key_env: LITELLM_API_KEY
+    litellm_model: openai/stola-default
+    model_examples:
+      - stola-default
+    enabled: true
+    notes: Local or central LiteLLM gateway. Keep internal-only until hardened.
+
+  - id: ollama
+    title: Ollama Local
+    kind: local
+    base_url: http://127.0.0.1:11434/v1
+    api_key_env: OLLAMA_API_KEY
+    litellm_model: ollama_chat/llama3.1
+    model_examples:
+      - llama3.1
+      - qwen2.5-coder
+    enabled: true
+    notes: Local dev only; usually no API key is required.
+
+  - id: vllm
+    title: vLLM OpenAI-Compatible Local
+    kind: local
+    base_url: http://127.0.0.1:8000/v1
+    api_key_env: VLLM_API_KEY
+    litellm_model: openai/local-vllm
+    model_examples:
+      - local-vllm
+    enabled: true
+
+  - id: lm_studio
+    title: LM Studio Local
+    kind: local
+    base_url: http://127.0.0.1:1234/v1
+    api_key_env: LM_STUDIO_API_KEY
+    litellm_model: openai/local-model
+    model_examples:
+      - local-model
+    enabled: true
+
+  - id: custom_openai_compatible
+    title: Custom OpenAI-Compatible Endpoint
+    kind: openai_compatible
+    base_url: ${STOLA_CUSTOM_OPENAI_BASE_URL}
+    api_key_env: STOLA_CUSTOM_OPENAI_API_KEY
+    extra_env:
+      - STOLA_CUSTOM_OPENAI_BASE_URL
+    litellm_model: openai/custom-model
+    model_examples:
+      - custom-model
+    enabled: true
+    notes: Escape hatch for any provider not listed yet.

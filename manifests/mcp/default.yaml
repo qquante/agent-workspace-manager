@@ -1,0 +1,324 @@
+version: 1
+name: stola-default-mcp
+description: Default Stola MCP allowlist for Docker-first agent workspaces.
+
+workspace:
+  root: /workspace
+  manifest_path: /opt/stola/manifests/mcp/default.yaml
+
+policy:
+  default_state: disabled
+  require_explicit_enable: true
+  secrets_from_env_only: true
+  audit_all_tool_calls: true
+  network_default: deny
+  filesystem_default: deny
+
+execution_policy:
+  enabled: true
+  default_action: allow
+  risk:
+    require_approval:
+      - high
+    deny: []
+  network:
+    allowed:
+      - none
+      - https_only
+    denied:
+      - raw
+      - raw_network
+      - unrestricted
+      - all
+  commands:
+    allowed_bins:
+      - npx
+      - uvx
+    denied_bins:
+      - docker
+      - podman
+      - kubectl
+      - pveum
+      - ssh
+      - powershell
+      - pwsh
+      - bash
+      - sh
+  rate_limit:
+    max_calls: 120
+    window: 1m
+  rules:
+    - id: filesystem-mutate-approval
+      action: require_approval
+      reason: Filesystem mutate tools require explicit approval.
+      match:
+        servers:
+          - filesystem
+        tools:
+          - write_file
+          - edit_file
+          - move_file
+          - create_directory
+    - id: git-approval
+      action: require_approval
+      reason: Git MCP can mutate workspace history.
+      match:
+        servers:
+          - git
+    - id: memory-approval
+      action: require_approval
+      reason: Memory MCP mutates local memory graph.
+      match:
+        servers:
+          - memory
+    - id: network-rate-limit
+      action: allow
+      reason: Network MCP calls are rate limited.
+      match:
+        networks:
+          - https_only
+      rate_limit:
+        max_calls: 30
+        window: 1m
+
+servers:
+  - id: filesystem
+    title: Workspace filesystem
+    default_enabled: true
+    risk: medium
+    transport: stdio
+    command:
+      - npx
+      - -y
+      - "@modelcontextprotocol/server-filesystem@2025.8.21"
+      - /workspace
+    permissions:
+      filesystem:
+        roots:
+          - /workspace
+        mode: read_write
+      network: none
+      secrets: []
+    tool_policy:
+      default_action: allow
+      rules:
+        - tool: write_file
+          action: require_approval
+          reason: Writes or overwrites workspace files.
+        - tool: edit_file
+          action: require_approval
+          reason: Edits existing workspace files.
+        - tool: move_file
+          action: require_approval
+          reason: Moves or renames workspace files/directories.
+        - tool: create_directory
+          action: require_approval
+          reason: Creates workspace directories.
+    argument_policy:
+      enabled: true
+      deny_unknown_tools: true
+      tools:
+        read_file:
+          - field: path
+            type: string
+            required: true
+        read_text_file:
+          - field: path
+            type: string
+            required: true
+        read_media_file:
+          - field: path
+            type: string
+            required: true
+        read_multiple_files:
+          - field: paths
+            type: string_array
+            required: true
+        write_file:
+          - field: path
+            type: string
+            required: true
+        edit_file:
+          - field: path
+            type: string
+            required: true
+        create_directory:
+          - field: path
+            type: string
+            required: true
+        list_directory:
+          - field: path
+            type: string
+            required: true
+        directory_tree:
+          - field: path
+            type: string
+            required: true
+        move_file:
+          - field: source
+            type: string
+            required: true
+          - field: destination
+            type: string
+            required: true
+        search_files:
+          - field: path
+            type: string
+            required: true
+        get_file_info:
+          - field: path
+            type: string
+            required: true
+        list_allowed_directories: []
+      protected_segments:
+        - .stola
+        - .git
+        - .ssh
+        - .gnupg
+        - .aws
+        - .azure
+        - .gcloud
+        - .kube
+        - .docker
+        - .config
+      protected_basenames:
+        - .env
+        - .env.local
+        - .env.production
+        - .git-credentials
+        - .gitconfig
+        - .netrc
+        - .npmrc
+        - .pypirc
+        - authorized_keys
+        - id_dsa
+        - id_ecdsa
+        - id_ed25519
+        - id_rsa
+        - known_hosts
+        - opencode.json
+      protected_suffixes:
+        - .key
+        - .pem
+        - .p12
+        - .pfx
+        - .kubeconfig
+      protected_name_markers:
+        - secret
+        - token
+        - credential
+        - private_key
+      overrides: []
+
+  - id: git
+    title: Workspace git
+    default_enabled: true
+    risk: medium
+    transport: stdio
+    command:
+      - uvx
+      - mcp-server-git
+      - --repository
+      - /workspace
+    permissions:
+      filesystem:
+        roots:
+          - /workspace
+        mode: read_write
+      network: none
+      secrets: []
+    tool_policy:
+      default_action: require_approval
+      rules: []
+
+  - id: fetch
+    title: HTTPS fetch
+    default_enabled: true
+    risk: medium
+    transport: stdio
+    command:
+      - uvx
+      - mcp-server-fetch
+    permissions:
+      filesystem:
+        roots: []
+        mode: none
+      network: https_only
+      secrets: []
+    tool_policy:
+      default_action: allow
+
+  - id: time
+    title: Time utilities
+    default_enabled: true
+    risk: low
+    transport: stdio
+    command:
+      - uvx
+      - mcp-server-time
+    permissions:
+      filesystem:
+        roots: []
+        mode: none
+      network: none
+      secrets: []
+    tool_policy:
+      default_action: allow
+
+  - id: memory
+    title: Local memory graph
+    default_enabled: true
+    risk: medium
+    transport: stdio
+    command:
+      - npx
+      - -y
+      - "@modelcontextprotocol/server-memory"
+    permissions:
+      filesystem:
+        roots:
+          - /workspace/.stola/memory
+        mode: read_write
+      network: none
+      secrets: []
+    tool_policy:
+      default_action: require_approval
+
+optional_servers:
+  - id: context7
+    title: Context7 documentation
+    default_enabled: false
+    risk: low
+    transport: http
+    url: https://mcp.context7.com/mcp
+    permissions:
+      network: https_only
+      secrets:
+        - CONTEXT7_API_KEY
+
+  - id: github
+    title: GitHub MCP
+    default_enabled: false
+    risk: high
+    transport: stdio
+    command:
+      - github-mcp-server
+      - stdio
+    permissions:
+      filesystem:
+        roots:
+          - /workspace
+        mode: read_write
+      network: https_only
+      secrets:
+        - GITHUB_TOKEN
+
+blocked_classes:
+  - host-shell
+  - docker-socket
+  - kubernetes-admin
+  - cloud-admin
+  - database-write
+  - browser-automation
+  - raw-network-scanner
+  - privileged-container
