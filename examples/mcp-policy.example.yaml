@@ -1,0 +1,32 @@
+version: 1
+id: stola-default-policy-v1
+
+execution_policy:
+  rate_limit:
+    max_calls: 120
+    window: 1m
+  rules:
+    - id: nano-filesystem-writes-need-approval
+      action: require_approval
+      reason: nano users need explicit approval for filesystem writes
+      match:
+        plans:
+          - nano
+        servers:
+          - filesystem
+        tools:
+          - write_file
+          - edit_file
+          - move_file
+          - create_directory
+
+servers:
+  - id: filesystem
+    argument_policy:
+      overrides:
+        - scope:
+            user_ids:
+              - trusted-lab-user
+          policy:
+            allow_protected_basenames:
+              - opencode.json

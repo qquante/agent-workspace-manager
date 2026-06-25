@@ -1,0 +1,12 @@
+tmp/
+*.db
+*.db-shm
+*.db-wal
+*.jsonl
+*.env
+!*.env.example
+!*.env.example.*
+*.token
+*.secret
+*.pem
+*.key

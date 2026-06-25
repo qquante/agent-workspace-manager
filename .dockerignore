@@ -1,0 +1,13 @@
+.git
+.codex
+tmp
+*.db
+*.db-*
+*.jsonl
+*.env
+!*.env.example
+!*.env.example.*
+*.token
+*.pem
+*.key
+*.secret
