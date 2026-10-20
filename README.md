@@ -26,7 +26,15 @@ User/policy configuration → control plane → isolated workspace and provider 
 
 ## Current limitations
 
-The current direction is a Docker workspace MVP. Earlier operating-system and virtualization concepts in design notes are not delivered features. Go is not installed in the review environment.
+The current direction is a Docker workspace MVP. Earlier operating-system and virtualization concepts in design notes are not delivered features. Unit tests use mocked runners and local test servers; real workspace provisioning has not been validated.
+
+## Validation
+
+Go 1.27.3 on Windows: all 12 packages with tests passed. Tests use temporary stores, mocked Docker runners and local HTTP servers.
+
+```console
+go test -count=1 ./...
+```
 
 ## License
 
